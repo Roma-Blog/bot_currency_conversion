@@ -1,32 +1,24 @@
-import requests, config, re
+from tools import CurrencyConverter, CustomException
+import config, telebot
 
-class CurrencyConverter:
+bot=telebot.TeleBot(config.TOKEN)
 
-    __сurrency_list = {
-        'рубль': 'RUB',
-        'доллар': 'USD',
-        'евро': 'EUR',
-    }
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.send_message(message.chat.id, 'Привет, я бот, который поможет тебе узнать курс валюты.')
 
-    def __init__(self, url: str):
-        self.__url = url
+@bot.message_handler(content_types=['text'])
+def dialog(message):
 
-    @staticmethod
-    def __get_exchange_rate(url: str, currencies: str, base_currency: str):
-        data_json = requests.get(url + '&currencies=' + currencies + '&base_currency=' + base_currency).json()
-        return data_json['data'][currencies]
+    currency_conversion = CurrencyConverter('https://api.freecurrencyapi.com/v1/latest?apikey=' + config.API_KEY)
+    bot.send_message(message.chat.id, currency_conversion.currency_conversion(message.text))
 
-    @staticmethod
-    def __processing_string(str: str, currency_list: dict):
-        list_word = str.split(' ')
+    
 
-        # currencies / base_currency / count
-        return currency_list[list_word[0]], currency_list[list_word[1]], int(list_word[2])
+try:
+    bot.polling(none_stop=True)
+except CustomException as e:
+    print(e) 
 
-    def currency_conversion(self, str: str):
-        currencies, base_currency, count = self.__processing_string(str, self.__сurrency_list)
-        return self.__get_exchange_rate(self.__url, currencies, base_currency) * count
-        
-
-currency_conversion = CurrencyConverter('https://api.freecurrencyapi.com/v1/latest?apikey=' + config.API_KEY)
-currency_conversion.currency_conversion('рубль доллар 100')
+# currency_conversion = CurrencyConverter('https://api.freecurrencyapi.com/v1/latest?apikey=' + config.API_KEY)
+# print(currency_conversion.currency_conversion('рубль доллар 100'))
