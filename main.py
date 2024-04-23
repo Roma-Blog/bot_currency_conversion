@@ -26,7 +26,7 @@ def values(message):
 def dialog(message):
 
     get_price = CurrencyConverter('https://api.freecurrencyapi.com/v1/latest?apikey=' + config.API_KEY, message.chat.id)
-    bot.send_message(message.chat.id, get_price.get_price(message.text))
+    bot.send_message(message.chat.id, 'Курс: ' + get_price.get_price(message.text))
 
 
 while True:

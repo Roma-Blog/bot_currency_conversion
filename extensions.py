@@ -41,4 +41,4 @@ class CurrencyConverter:
 
     def get_price(self, str: str):
         currencies, base_currency, count = self.__processing_string(str, self.__сurrency_list, self.__chat_id)
-        return self.__get_exchange_rate(self.__url, currencies, base_currency) * count
+        return '{:.2f}'.format(self.__get_exchange_rate(self.__url, currencies, base_currency) * count)
