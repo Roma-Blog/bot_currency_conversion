@@ -1,4 +1,4 @@
-from tools import CurrencyConverter, CustomException
+from extensions import CurrencyConverter, APIException 
 import config, telebot
 
 bot=telebot.TeleBot(config.TOKEN)
@@ -17,15 +17,20 @@ def help(message):
     bot.send_message(message.chat.id, 'Например: рубль доллар 100')
     bot.send_message(message.chat.id, 'Доступны валюты: рубль, доллар, евро')
 
+@bot.message_handler(commands=['values'])
+def values(message):
+    bot.send_message(message.chat.id, 'Доступны валюты: рубль, доллар, евро')
+
+
 @bot.message_handler(content_types=['text'])
 def dialog(message):
 
-    currency_conversion = CurrencyConverter('https://api.freecurrencyapi.com/v1/latest?apikey=' + config.API_KEY, message.chat.id)
-    bot.send_message(message.chat.id, currency_conversion.currency_conversion(message.text))
+    get_price = CurrencyConverter('https://api.freecurrencyapi.com/v1/latest?apikey=' + config.API_KEY, message.chat.id)
+    bot.send_message(message.chat.id, get_price.get_price(message.text))
 
 
 while True:
     try:
         bot.polling(none_stop=True)
-    except CustomException as e:
+    except APIException as e:
         bot.send_message(e.chat_id, e)
